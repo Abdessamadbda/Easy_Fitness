@@ -1,5 +1,7 @@
 import 'package:easy_fitness/datamanager.dart';
+import 'package:easy_fitness/pages/favoritepage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../datamodel.dart';
 
@@ -26,7 +28,6 @@ class MusclePage extends StatelessWidget {
                   var category = snapshot.data![index];
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                  
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
@@ -78,20 +79,61 @@ class MusclePage extends StatelessWidget {
   }
 }
 
-class ExerciceItem extends StatelessWidget {
+class ExerciceItem extends StatefulWidget {
+  final bool showFavoriteIcon;
   final Exercice exercice;
-  const ExerciceItem({Key? key, required this.exercice})
+  const ExerciceItem(
+      {Key? key, required this.exercice, this.showFavoriteIcon = true})
       : super(key: key);
+  @override
+  State<ExerciceItem> createState() => _ExerciceItemState();
+}
+
+class _ExerciceItemState extends State<ExerciceItem> {
+  bool isFavorite = false;
+  @override
+  void initState() {
+    super.initState();
+
+    // Fetch the initial favorite status when the widget is created
+    isFavorite = Provider.of<FavoriteExercisesNotifier>(context, listen: false)
+        .favoriteExercises
+        .contains(widget.exercice);
+  }
 
   @override
   Widget build(BuildContext context) {
+    var favoriteNotifier =
+        Provider.of<FavoriteExercisesNotifier>(context, listen: false);
+
     return Container(
       padding: const EdgeInsets.all(4.0),
       child: Card(
         elevation: 4,
         child: Column(
           children: [
-            Image.network(exercice.imageUrl),
+            Stack(
+              children: [
+                Image.network(widget.exercice.imageUrl),
+                if (widget.showFavoriteIcon)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isFavorite = !isFavorite;
+                        });
+                        favoriteNotifier.toggleFavorite(widget.exercice);
+                      },
+                      icon: Icon(
+                        Icons.favorite,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -101,15 +143,12 @@ class ExerciceItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SelectableText(
-                        exercice.name,
+                        widget.exercice.name,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
-                  ElevatedButton(
-                      onPressed: () {
-                      },
-                      child: const Text("Detail"))
+                  ElevatedButton(onPressed: () {}, child: const Text("Detail"))
                 ],
               ),
             ),
