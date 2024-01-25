@@ -1,60 +1,86 @@
 import 'package:easy_fitness/datamodel.dart';
-import 'package:easy_fitness/pages/equipmentpage.dart';
-import 'package:easy_fitness/pages/musclepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class FavoritePage extends StatelessWidget {
-  const FavoritePage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    var favoriteExercises =
-        Provider.of<FavoriteExercisesNotifier>(context).favoriteExercises;
+    // Access the FavoriteExercisesNotifier from the provider
+    final favoriteExercisesNotifier =
+        Provider.of<FavoriteExercisesNotifier>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorite Exercises'),
+        title: Text('Favorite Images'),
       ),
-      body: favoriteExercises.isEmpty
-          ? Center(
-              child: Text('No favorite exercises yet.'),
-            )
-          : ListView.builder(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              itemCount: favoriteExercises.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top: 8.0, bottom: 8.0, left: 68.0, right: 68.0),
-                      child: ExerciceItem(
-                        exercice: favoriteExercises[index],
-                        showFavoriteIcon: false,
+      body: ListView.builder(
+        itemCount: favoriteExercisesNotifier.favoriteImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Card(
+              elevation: 4.0, // You can adjust the elevation as needed
+              child: Stack(
+                children: [
+                  // Image in the center
+                  Image.network(
+                    favoriteExercisesNotifier.favoriteImages[index],
+                    fit: BoxFit.fill,
+                    width: double.infinity,
+                    height: 200.0, // Adjust the height as needed
+                  ),
+                  // Label in the top right corner
+                  Positioned(
+                    top: 8.0,
+                    right: 8.0,
+                    child: Container(
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Text(
+                        favoriteExercisesNotifier
+                            ._favoriteExercises[index].name,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ],
-                );
-              },
+                  ),
+                ],
+              ),
             ),
+          );
+        },
+      ),
     );
   }
 }
 
 class FavoriteExercisesNotifier extends ChangeNotifier {
+  List<String> _favoriteImages = [];
   List<Exercice> _favoriteExercises = [];
 
-  List<Exercice> get favoriteExercises => _favoriteExercises;
+  List<String> get favoriteImages => _favoriteImages;
 
-  void toggleFavorite(Exercice exercice) {
-    if (_favoriteExercises.contains(exercice)) {
+  void toggleFavoriteImage(String imageUrl, Exercice exercice) {
+    if (_favoriteImages.contains(imageUrl)) {
+      removeFavoriteImage(imageUrl);
       _favoriteExercises.remove(exercice);
     } else {
+      addFavoriteImage(imageUrl);
       _favoriteExercises.add(exercice);
     }
+  }
+
+  void addFavoriteImage(String imageUrl) {
+    _favoriteImages.add(imageUrl);
+    notifyListeners();
+  }
+
+  void removeFavoriteImage(String imageUrl) {
+    _favoriteImages.remove(imageUrl);
     notifyListeners();
   }
 }

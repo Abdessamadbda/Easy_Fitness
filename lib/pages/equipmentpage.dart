@@ -78,31 +78,22 @@ class EquipmentPage extends StatelessWidget {
 }
 
 class ExerciseItem extends StatefulWidget {
-  final bool showFavoriteIcon;
   final Exercice exercice;
-  const ExerciseItem(
-      {Key? key, required this.exercice, this.showFavoriteIcon = true})
-      : super(key: key);
+  const ExerciseItem({Key? key, required this.exercice}) : super(key: key);
   @override
   State<ExerciseItem> createState() => _ExerciseItemState();
 }
 
 class _ExerciseItemState extends State<ExerciseItem> {
-  bool isFavorite = false;
   @override
   void initState() {
     super.initState();
 
     // Fetch the initial favorite status when the widget is created
-    isFavorite = Provider.of<FavoriteExercisesNotifier>(context, listen: false)
-        .favoriteExercises
-        .contains(widget.exercice);
   }
 
   @override
   Widget build(BuildContext context) {
-    var favoriteNotifier =
-        Provider.of<FavoriteExercisesNotifier>(context, listen: false);
     return Container(
       padding: const EdgeInsets.all(4.0),
       child: Card(
@@ -112,23 +103,6 @@ class _ExerciseItemState extends State<ExerciseItem> {
             Stack(
               children: [
                 Image.network(widget.exercice.imageUrl),
-                if (widget.showFavoriteIcon)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isFavorite = !isFavorite;
-                        });
-                        favoriteNotifier.toggleFavorite(widget.exercice);
-                      },
-                      icon: Icon(
-                        Icons.favorite,
-                        color: isFavorite ? Colors.red : Colors.grey,
-                      ),
-                    ),
-                  ),
               ],
             ),
             Padding(

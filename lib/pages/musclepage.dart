@@ -1,9 +1,11 @@
 import 'package:easy_fitness/datamanager.dart';
+import 'package:easy_fitness/pages/MuscleDetail.dart';
 import 'package:easy_fitness/pages/favoritepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../datamodel.dart';
+import '../datamanager.dart';
 
 class MusclePage extends StatelessWidget {
   final DataManager dataManager;
@@ -80,32 +82,20 @@ class MusclePage extends StatelessWidget {
 }
 
 class ExerciceItem extends StatefulWidget {
-  final bool showFavoriteIcon;
   final Exercice exercice;
-  const ExerciceItem(
-      {Key? key, required this.exercice, this.showFavoriteIcon = true})
-      : super(key: key);
+  const ExerciceItem({Key? key, required this.exercice}) : super(key: key);
   @override
   State<ExerciceItem> createState() => _ExerciceItemState();
 }
 
 class _ExerciceItemState extends State<ExerciceItem> {
-  bool isFavorite = false;
   @override
   void initState() {
     super.initState();
-
-    // Fetch the initial favorite status when the widget is created
-    isFavorite = Provider.of<FavoriteExercisesNotifier>(context, listen: false)
-        .favoriteExercises
-        .contains(widget.exercice);
   }
 
   @override
   Widget build(BuildContext context) {
-    var favoriteNotifier =
-        Provider.of<FavoriteExercisesNotifier>(context, listen: false);
-
     return Container(
       padding: const EdgeInsets.all(4.0),
       child: Card(
@@ -115,23 +105,6 @@ class _ExerciceItemState extends State<ExerciceItem> {
             Stack(
               children: [
                 Image.network(widget.exercice.imageUrl),
-                if (widget.showFavoriteIcon)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isFavorite = !isFavorite;
-                        });
-                        favoriteNotifier.toggleFavorite(widget.exercice);
-                      },
-                      icon: Icon(
-                        Icons.favorite,
-                        color: isFavorite ? Colors.red : Colors.grey,
-                      ),
-                    ),
-                  ),
               ],
             ),
             Padding(
@@ -148,7 +121,17 @@ class _ExerciceItemState extends State<ExerciceItem> {
                       ),
                     ],
                   ),
-                  ElevatedButton(onPressed: () {}, child: const Text("Detail"))
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MuscleDetail(exercise: widget.exercice),
+                          ),
+                        );
+                      },
+                      child: const Text("Detail"))
                 ],
               ),
             ),

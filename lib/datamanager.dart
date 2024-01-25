@@ -9,8 +9,11 @@ class DataManager {
 
   fetchMenu() async {
     try {
-      const url = 'https://abdessamadbda.github.io/easyfitness_api/exercises.json';
+      const url =
+          'https://abdessamadbda.github.io/easyfitness_api/exercises.json';
       var response = await http.get(Uri.parse(url));
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         _category = [];
@@ -19,18 +22,19 @@ class DataManager {
           _category?.add(Category.fromJson(json));
         }
       } else {
+        print('Error: ${response.statusCode}');
         throw Exception("Error loading data");
       }
     } catch (e) {
+      print('Exception: $e');
       throw Exception("Error loading data");
     }
   }
 
-    Future<List<Category>> getMenu() async {
+  Future<List<Category>> getMenu() async {
     if (_category == null) {
       await fetchMenu();
     }
     return _category!;
   }
-
 }
