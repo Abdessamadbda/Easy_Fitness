@@ -72,10 +72,44 @@ class FavoriteExercisesNotifier extends ChangeNotifier {
   }
 
   Future<void> toggleFavoriteImage(String imageUrl, Exercice exercice) async {
-    if (_isFavorite(imageUrl, exercice)) {
+    if (_isFavorite(imageUrl, exercice) == true) {
       await removeFavoriteItem(imageUrl, exercice);
     } else {
       await addFavoriteItem(imageUrl, exercice);
+    }
+  }
+
+  Object _isFavorite(String imageUrl, Exercice exercice) {
+    // Check if the item is in the local list
+    bool isFavoriteLocal = _favoriteItems
+        .any((item) => item.imageUrl == imageUrl && item.exercice == exercice);
+
+    if (isFavoriteLocal) {
+      // If it's in the local list, consider it a favorite
+      return true;
+    } else {
+      // If it's not in the local list, check shared preferences
+      return _isFavoriteInSharedPreferences(imageUrl, exercice);
+    }
+  }
+
+  Future<bool> _isFavoriteInSharedPreferences(
+      String imageUrl, Exercice exercice) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? serializedItems = prefs.getStringList('favoriteItems');
+
+    if (serializedItems != null) {
+      // Deserialize items from shared preferences
+      List<FavoriteItem> favoriteItems = serializedItems
+          .map((serializedItem) =>
+              FavoriteItem.fromJson(jsonDecode(serializedItem)))
+          .toList();
+
+      // Check if the item is in the shared preferences list
+      return favoriteItems.any(
+          (item) => item.imageUrl == imageUrl && item.exercice == exercice);
+    } else {
+      return false; // If no data found in shared preferences, consider it not a favorite
     }
   }
 
@@ -92,14 +126,10 @@ class FavoriteExercisesNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _isFavorite(String imageUrl, Exercice exercice) {
-    return _favoriteItems
-        .any((item) => item.imageUrl == imageUrl && item.exercice == exercice);
-  }
-
   // Function to save favorites using shared_preferences
   Future<void> saveFavorites() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     List<String> serializedItems =
         _favoriteItems.map((item) => jsonEncode(item.toJson())).toList();
     await prefs.setStringList('favoriteItems', serializedItems);
@@ -109,6 +139,7 @@ class FavoriteExercisesNotifier extends ChangeNotifier {
   // Function to load favorites using shared_preferences
   Future<void> loadFavorites() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     List<String>? serializedItems = prefs.getStringList('favoriteItems');
 
     if (serializedItems != null) {
@@ -117,6 +148,7 @@ class FavoriteExercisesNotifier extends ChangeNotifier {
               FavoriteItem.fromJson(jsonDecode(serializedItem)))
           .toList();
     }
+
     notifyListeners();
   }
 }

@@ -19,11 +19,6 @@ class _MuscleDetailState extends State<MuscleDetail> {
 
   @override
   Widget build(BuildContext context) {
-    var isFavoriteImageList = Provider.of<FavoriteExercisesNotifier>(context)
-        .favoriteItems
-        .map((item) => item.imageUrl)
-        .toList();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -33,89 +28,129 @@ class _MuscleDetailState extends State<MuscleDetail> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 40.0),
-            child: Stack(
-              children: [
-                CarouselSlider(
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
-                    enlargeCenterPage: true,
-                    autoPlay: true,
-                    aspectRatio: 19 / 9,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                    },
-                  ),
-                  items: widget.exercise.photos.asMap().entries.map((entry) {
-                    final int index = entry.key;
-                    final bool isFavorite = isFavoriteImageList
-                        .contains(widget.exercise.getPhotoUrlByIndex(index));
-                    print('Is Favorite: $isFavorite');
+            child: Consumer<FavoriteExercisesNotifier>(
+              builder: (context, favoriteExercisesNotifier, child) {
+                var isFavoriteImageList = favoriteExercisesNotifier
+                    .favoriteItems
+                    .map((item) => item.imageUrl)
+                    .toList();
 
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return GestureDetector(
-                          onTap: () {
-                            Provider.of<FavoriteExercisesNotifier>(context,
-                                    listen: false)
-                                .toggleFavoriteImage(
+                return Stack(
+                  children: [
+                    CarouselSlider(
+                      carouselController: _carouselController,
+                      options: CarouselOptions(
+                        enlargeCenterPage: true,
+                        autoPlay: true,
+                        aspectRatio: 19 / 9,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                      ),
+                      items:
+                          widget.exercise.photos.asMap().entries.map((entry) {
+                        final int index = entry.key;
+                        final bool isFavorite = isFavoriteImageList.contains(
+                            widget.exercise.getPhotoUrlByIndex(index));
+
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return GestureDetector(
+                              onTap: () {
+                                favoriteExercisesNotifier.toggleFavoriteImage(
                                     widget.exercise.getPhotoUrlByIndex(index),
                                     widget.exercise);
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.0),
-                              border: Border.all(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inversePrimary,
-                                width: 2.0,
-                              ),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  Image.network(
-                                    widget.exercise.getPhotoUrlByIndex(index),
-                                    fit: BoxFit.fill,
-                                    height: double.infinity,
-                                    width: double.infinity,
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .inversePrimary,
+                                    width: 2.0,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      isFavorite
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: Colors.red,
+                                ),
+                                child: Stack(
+                                  alignment: Alignment.topRight,
+                                  children: [
+                                    Image.network(
+                                      widget.exercise.getPhotoUrlByIndex(index),
+                                      fit: BoxFit.fill,
+                                      height: double.infinity,
+                                      width: double.infinity,
                                     ),
-                                  ),
-                                ],
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: Text(widget.exercise
+                                                        .getExByIndex(index)),
+                                                    content: Text(widget
+                                                        .exercise
+                                                        .getDetailByIndex(
+                                                            index)),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text("OK"),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Icon(
+                                              Icons.info,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          Icon(
+                                            isFavorite
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
+                                            color: Colors.red,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         );
-                      },
-                    );
-                  }).toList(),
-                ),
-                Positioned(
-                  bottom: 10.0,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      widget.exercise.photos.length,
-                      (index) => buildDot(index),
+                      }).toList(),
                     ),
-                  ),
-                ),
-              ],
+                    Positioned(
+                      bottom: 10.0,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          widget.exercise.photos.length,
+                          (index) => buildDot(index),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           // Other details about the exercise
