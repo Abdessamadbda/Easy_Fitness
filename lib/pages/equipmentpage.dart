@@ -1,5 +1,6 @@
 import 'package:easy_fitness/datamanager.dart';
 import 'package:easy_fitness/datamodel.dart';
+import 'package:easy_fitness/pages/EquipmentDetail.dart';
 import 'package:easy_fitness/pages/favoritepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -119,7 +120,17 @@ class _ExerciseItemState extends State<ExerciseItem> {
                       ),
                     ],
                   ),
-                  ElevatedButton(onPressed: () {}, child: const Text("Detail"))
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EquipmentDetail(exercise: widget.exercice),
+                          ),
+                        );
+                      },
+                      child: const Text("Detail"))
                 ],
               ),
             ),

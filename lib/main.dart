@@ -5,10 +5,16 @@ import 'package:easy_fitness/pages/musclepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  FavoriteExercisesNotifier favoriteExercisesNotifier =
+      FavoriteExercisesNotifier();
+  await favoriteExercisesNotifier.loadFavorites();
+
   runApp(
     ChangeNotifierProvider(
-      create: (context) => FavoriteExercisesNotifier(),
+      create: (context) => favoriteExercisesNotifier,
       child: MyApp(),
     ),
   );
@@ -17,7 +23,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -57,7 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 2:
-        currentWidgetPage = FavoritePage();
+        currentWidgetPage = FavoritePage(
+          favoriteExercisesNotifier:
+              Provider.of<FavoriteExercisesNotifier>(context),
+        );
         break;
     }
     return Scaffold(

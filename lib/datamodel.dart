@@ -33,6 +33,15 @@ class Exercice {
     required this.type,
     required this.photos,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'image': image,
+      'type': type,
+      'photos': photos,
+    };
+  }
 
   factory Exercice.fromJson(Map<String, dynamic> json) {
     return Exercice(

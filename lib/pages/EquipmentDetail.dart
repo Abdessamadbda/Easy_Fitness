@@ -4,16 +4,16 @@ import 'package:easy_fitness/pages/favoritepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MuscleDetail extends StatefulWidget {
+class EquipmentDetail extends StatefulWidget {
   final Exercice exercise;
 
-  const MuscleDetail({Key? key, required this.exercise}) : super(key: key);
+  const EquipmentDetail({Key? key, required this.exercise}) : super(key: key);
 
   @override
-  _MuscleDetailState createState() => _MuscleDetailState();
+  _EquipmentDetailState createState() => _EquipmentDetailState();
 }
 
-class _MuscleDetailState extends State<MuscleDetail> {
+class _EquipmentDetailState extends State<EquipmentDetail> {
   final CarouselController _carouselController = CarouselController();
   int _currentIndex = 0;
 
@@ -51,7 +51,6 @@ class _MuscleDetailState extends State<MuscleDetail> {
                     final int index = entry.key;
                     final bool isFavorite = isFavoriteImageList
                         .contains(widget.exercise.getPhotoUrlByIndex(index));
-                    print('Is Favorite: $isFavorite');
 
                     return Builder(
                       builder: (BuildContext context) {

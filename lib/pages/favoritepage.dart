@@ -1,56 +1,60 @@
+import 'dart:convert';
+
 import 'package:easy_fitness/datamodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoritePage extends StatelessWidget {
+  final FavoriteExercisesNotifier favoriteExercisesNotifier;
+
+  FavoritePage({required this.favoriteExercisesNotifier});
   @override
   Widget build(BuildContext context) {
-    // Access the FavoriteExercisesNotifier from the provider
-    final favoriteExercisesNotifier =
-        Provider.of<FavoriteExercisesNotifier>(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorite Images'),
+        title: Text('Favorite Exercises'),
       ),
-      body: ListView.builder(
-        itemCount: favoriteExercisesNotifier.favoriteImages.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Card(
-              elevation: 4.0, // You can adjust the elevation as needed
-              child: Stack(
-                children: [
-                  // Image in the center
-                  Image.network(
-                    favoriteExercisesNotifier.favoriteImages[index],
-                    fit: BoxFit.fill,
-                    width: double.infinity,
-                    height: 200.0, // Adjust the height as needed
-                  ),
-                  // Label in the top right corner
-                  Positioned(
-                    top: 8.0,
-                    right: 8.0,
-                    child: Container(
-                      padding: EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(4.0),
+      body: Consumer<FavoriteExercisesNotifier>(
+        builder: (context, favoriteExercisesNotifier, child) {
+          return ListView.builder(
+            itemCount: favoriteExercisesNotifier.favoriteItems.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Card(
+                  elevation: 4.0,
+                  child: Stack(
+                    children: [
+                      Image.network(
+                        favoriteExercisesNotifier.favoriteItems[index].imageUrl,
+                        fit: BoxFit.fill,
+                        width: double.infinity,
+                        height: 200.0,
                       ),
-                      child: Text(
-                        favoriteExercisesNotifier
-                            ._favoriteExercises[index].name,
-                        style: TextStyle(
-                          color: Colors.white,
+                      Positioned(
+                        top: 8.0,
+                        right: 8.0,
+                        child: Container(
+                          padding: EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          child: Text(
+                            favoriteExercisesNotifier
+                                ._favoriteItems[index].exercice.name,
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
       ),
@@ -59,28 +63,78 @@ class FavoritePage extends StatelessWidget {
 }
 
 class FavoriteExercisesNotifier extends ChangeNotifier {
-  List<String> _favoriteImages = [];
-  List<Exercice> _favoriteExercises = [];
+  List<FavoriteItem> _favoriteItems = [];
 
-  List<String> get favoriteImages => _favoriteImages;
+  List<FavoriteItem> get favoriteItems => _favoriteItems;
+  void copyFrom(FavoriteExercisesNotifier other) {
+    _favoriteItems = List.from(other._favoriteItems);
+    notifyListeners();
+  }
 
-  void toggleFavoriteImage(String imageUrl, Exercice exercice) {
-    if (_favoriteImages.contains(imageUrl)) {
-      removeFavoriteImage(imageUrl);
-      _favoriteExercises.remove(exercice);
+  Future<void> toggleFavoriteImage(String imageUrl, Exercice exercice) async {
+    if (_isFavorite(imageUrl, exercice)) {
+      await removeFavoriteItem(imageUrl, exercice);
     } else {
-      addFavoriteImage(imageUrl);
-      _favoriteExercises.add(exercice);
+      await addFavoriteItem(imageUrl, exercice);
     }
   }
 
-  void addFavoriteImage(String imageUrl) {
-    _favoriteImages.add(imageUrl);
+  Future<void> addFavoriteItem(String imageUrl, Exercice exercice) async {
+    _favoriteItems.add(FavoriteItem(imageUrl: imageUrl, exercice: exercice));
+    await saveFavorites();
     notifyListeners();
   }
 
-  void removeFavoriteImage(String imageUrl) {
-    _favoriteImages.remove(imageUrl);
+  Future<void> removeFavoriteItem(String imageUrl, Exercice exercice) async {
+    _favoriteItems.removeWhere(
+        (item) => item.imageUrl == imageUrl && item.exercice == exercice);
+    await saveFavorites();
     notifyListeners();
+  }
+
+  bool _isFavorite(String imageUrl, Exercice exercice) {
+    return _favoriteItems
+        .any((item) => item.imageUrl == imageUrl && item.exercice == exercice);
+  }
+
+  // Function to save favorites using shared_preferences
+  Future<void> saveFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> serializedItems =
+        _favoriteItems.map((item) => jsonEncode(item.toJson())).toList();
+    await prefs.setStringList('favoriteItems', serializedItems);
+    notifyListeners();
+  }
+
+  // Function to load favorites using shared_preferences
+  Future<void> loadFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? serializedItems = prefs.getStringList('favoriteItems');
+
+    if (serializedItems != null) {
+      _favoriteItems = serializedItems
+          .map((serializedItem) =>
+              FavoriteItem.fromJson(jsonDecode(serializedItem)))
+          .toList();
+    }
+    notifyListeners();
+  }
+}
+
+class FavoriteItem {
+  final String imageUrl;
+  final Exercice exercice;
+
+  FavoriteItem({required this.imageUrl, required this.exercice});
+
+  Map<String, dynamic> toJson() {
+    return {'imageUrl': imageUrl, 'exercice': exercice.toJson()};
+  }
+
+  factory FavoriteItem.fromJson(Map<String, dynamic> json) {
+    return FavoriteItem(
+      imageUrl: json['imageUrl'],
+      exercice: Exercice.fromJson(json['exercice']),
+    );
   }
 }
