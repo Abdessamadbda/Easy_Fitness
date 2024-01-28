@@ -2,7 +2,7 @@
     <application
         android:label="easy_fitness"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/easyfitness">
         <activity
             android:name=".MainActivity"
             android:exported="true"

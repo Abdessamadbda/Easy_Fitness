@@ -47,6 +47,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var dataManager = DataManager();
   var selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     Widget currentWidgetPage = const Text("!!!!");
@@ -71,7 +72,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Image.asset("images/logo.png"),
+        // Adjust the logo size by setting the height
+        title: Image.asset(
+          "images/logo.png",
+          height: 100, // Set the desired height
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: selectedIndex,
