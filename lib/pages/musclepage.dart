@@ -1,11 +1,7 @@
-import 'package:easy_fitness/datamanager.dart';
 import 'package:easy_fitness/pages/MuscleDetail.dart';
-import 'package:easy_fitness/pages/favoritepage.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../datamodel.dart';
-import '../datamanager.dart';
+import 'package:easy_fitness/datamodel.dart';
+import 'package:easy_fitness/datamanager.dart';
 
 class MusclePage extends StatelessWidget {
   final DataManager dataManager;
@@ -16,13 +12,23 @@ class MusclePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: FutureBuilder<List<Category>>(
-        future: dataManager.getMenu(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Exercises By Muscle',
+          style: TextStyle(
+            fontFamily: 'FiraSansItalic',
+            color: Color.fromARGB(255, 25, 42, 85),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: FutureBuilder<List<Category>>(
+          future: dataManager.getMenu(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
                 itemCount: 1,
                 itemBuilder: (context, index) {
                   index = 0;
@@ -33,10 +39,9 @@ class MusclePage extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
-                            top: 32.0, bottom: 8.0, left: 8.0),
-                        child: Text(
-                          "Exercises By Muscle : ",
-                          style: TextStyle(color: Colors.brown.shade400),
+                          top: 0.0,
+                          bottom: 8.0,
+                          left: 8.0,
                         ),
                       ),
                       if (screenSize.width < 500)
@@ -69,17 +74,21 @@ class MusclePage extends StatelessWidget {
                         )
                     ],
                   );
-                });
-          } else if (snapshot.hasError) {
-            return Text('${snapshot.error}');
-          }
-          // By default, show a loading spinner.
-          return const CircularProgressIndicator();
-        },
+                },
+              );
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            }
+            // By default, show a loading spinner.
+            return const CircularProgressIndicator();
+          },
+        ),
       ),
     );
   }
 }
+
+// ... (rest of your code)
 
 class ExerciceItem extends StatefulWidget {
   final Exercice exercice;
@@ -100,6 +109,7 @@ class _ExerciceItemState extends State<ExerciceItem> {
       padding: const EdgeInsets.all(4.0),
       child: Card(
         elevation: 4,
+        color: Color.fromARGB(255, 235, 232, 212),
         child: Column(
           children: [
             Stack(
@@ -122,16 +132,34 @@ class _ExerciceItemState extends State<ExerciceItem> {
                     ],
                   ),
                   ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                MuscleDetail(exercise: widget.exercice),
-                          ),
-                        );
-                      },
-                      child: const Text("Detail"))
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MuscleDetail(exercise: widget.exercice),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color.fromARGB(
+                          255, 25, 42, 85), // Background color
+                      onPrimary: const Color.fromARGB(
+                          255, 255, 255, 255), // Text color
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8), // Padding
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(8.0), // Border radius
+                      ),
+                    ),
+                    child: const Text(
+                      "Detail",
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -13,7 +13,13 @@ class FavoritePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorite Exercises'),
+        title: Text(
+          'Favorite Exercises',
+          style: TextStyle(
+            fontFamily: 'FiraSansItalic',
+            color: Color.fromARGB(255, 25, 42, 85),
+          ),
+        ),
       ),
       body: Consumer<FavoriteExercisesNotifier>(
         builder: (context, favoriteExercisesNotifier, child) {

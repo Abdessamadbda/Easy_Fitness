@@ -20,8 +20,14 @@ class _MuscleDetailState extends State<MuscleDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.exercise.name),
+        backgroundColor: Color.fromARGB(255, 240, 228, 63),
+        title: Text(
+          widget.exercise.name,
+          style: TextStyle(
+            color: Color.fromARGB(255, 25, 42, 85),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Column(
         //mainAxisAlignment: MainAxisAlignment.center,

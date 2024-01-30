@@ -71,11 +71,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Adjust the logo size by setting the height
+        backgroundColor: Color.fromARGB(255, 240, 228, 63),
         title: Image.asset(
           "images/logo.png",
-          height: 100, // Set the desired height
+          height: 120,
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -85,9 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
               selectedIndex = newIndex;
             });
           },
-          backgroundColor: Theme.of(context).secondaryHeaderColor,
-          selectedItemColor: Theme.of(context).primaryColor,
-          unselectedItemColor: const Color.fromARGB(255, 0, 0, 0),
+          backgroundColor: Colors.yellow.shade100,
+          selectedItemColor: Color.fromARGB(255, 25, 42, 85),
+          unselectedItemColor: Color.fromARGB(255, 143, 140, 140),
           items: const [
             BottomNavigationBarItem(
               label: "By Muscle",
