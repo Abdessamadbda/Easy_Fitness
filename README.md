@@ -1,4 +1,4 @@
-![image-removebg-preview (1)](https://github.com/Abdessamadbda/Easy_Fitness/assets/117985369/f3a876c3-a7c9-4ff9-902e-72ac4d1d1eeb)# EasyFitness App
+# EasyFitness App
 
 Welcome to EasyFitness, your go-to companion for kickstarting your fitness journey! This Flutter-based mobile application is designed to provide easy access to a wide range of exercises, tailored specifically for newcomers to fitness. With categorized exercises, detailed instructions, and the ability to customize your favorites, EasyFitness makes getting started with your fitness goals simpler than ever.
 
